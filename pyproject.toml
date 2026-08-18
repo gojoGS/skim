@@ -21,8 +21,13 @@ dependencies = [
     "rich>=13.0.0",
     "pyyaml>=6.0",
     "pydantic>=2.0.0",
-    "questionary>=1.10.0",
     "questionary>=2.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
 ]
 
 [project.scripts]
