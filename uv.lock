@@ -780,7 +780,7 @@ wheels = [
 ]
 
 [[package]]
-name = "sklm-cli"
+name = "skim"
 version = "0.2.0"
 source = { editable = "." }
 dependencies = [

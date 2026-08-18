@@ -7,10 +7,10 @@ from typing import Optional
 
 from rich.console import Console
 
-from sklm.models import ResourceKind, ResourceRef
-from sklm.core.workspace import Workspace
-from sklm.core.registry import RegistryManager
-from sklm.store import GlobalStore
+from skim.models import ResourceKind, ResourceRef
+from skim.core.workspace import Workspace
+from skim.core.registry import RegistryManager
+from skim.store import GlobalStore
 
 
 console = Console()
@@ -37,7 +37,7 @@ def remove_resource_from_workspace(
     if not ref:
         raise KeyError(f"Resource '{kind.value}:{name}' not found in workspace")
     if ref.linked:
-        from sklm.core.linking import unlink_resource
+        from skim.core.linking import unlink_resource
         unlink_resource(workspace, kind, name)
     return workspace.remove_resource(kind, name)
 

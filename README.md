@@ -154,10 +154,10 @@ skim update --force                 # bypass 24h cache
 Disable the automatic check by setting:
 
 ```bash
-export skim_NO_UPDATE_CHECK=1
+export SKIM_NO_UPDATE_CHECK=1
 ```
 
-Updates are installed via `pip install -U skim-cli`. The version check uses the [GitHub Releases](https://github.com/Auran0s/skim/releases) API.
+Updates are installed via `pip install -U skim`. The version check uses the [GitHub Releases](https://github.com/gojoGS/skim/releases) API.
 
 ### Supported Agents
 

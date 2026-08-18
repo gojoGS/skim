@@ -3,7 +3,7 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sklm-cli"
+name = "skim"
 version = "0.2.0"
 description = "Skills manager for AI agents"
 readme = "README.md"
@@ -31,10 +31,10 @@ dev = [
 ]
 
 [project.scripts]
-sklm = "sklm.cli.main:run"
+skim = "skim.cli.main:run"
 
 [tool.setuptools.packages.find]
-include = ["sklm*"]
+include = ["skim*"]
 
 [tool.setuptools.package-data]
-sklm = ["agents/agents.yaml"]
+skim = ["agents/agents.yaml"]
