@@ -1,4 +1,4 @@
-"""Pydantic data models for Sklm."""
+"""Pydantic data models for Skim."""
 
 from __future__ import annotations
 
