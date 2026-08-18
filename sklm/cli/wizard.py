@@ -610,7 +610,6 @@ def settings_menu(f: Sklm) -> None:
                 "Settings:",
                 choices=[
                     "Manage agents",
-                    "Toggle telemetry",
                     "Check for updates",
                     "Manage registries",
                     _BACK_CHOICE,
@@ -623,28 +622,10 @@ def settings_menu(f: Sklm) -> None:
             return
         elif choice == "Manage agents":
             agents_menu(f)
-        elif choice == "Toggle telemetry":
-            _toggle_telemetry(f)
         elif choice == "Check for updates":
             _check_updates()
         elif choice == "Manage registries":
             registries_menu(f)
-
-
-def _toggle_telemetry(f: Sklm) -> None:
-    """Toggle telemetry on or off."""
-    from sklm.store import GlobalStore
-
-    store = GlobalStore()
-    cfg = store.get_telemetry_config()
-    if cfg.enabled:
-        cfg.enabled = False
-        store.set_telemetry_config(cfg)
-        console.print("[yellow]⚠ Telemetry disabled[/]")
-    else:
-        cfg.enabled = True
-        store.set_telemetry_config(cfg)
-        console.print("[green]✓ Telemetry enabled[/]")
 
 
 def _check_updates() -> None:

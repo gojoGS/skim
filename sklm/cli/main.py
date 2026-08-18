@@ -3,12 +3,9 @@
 from __future__ import annotations
 
 import os
-import re
 import shutil
 import subprocess
 import sys
-import time
-import traceback as tb_mod
 from pathlib import Path
 from typing import Optional
 
@@ -37,25 +34,6 @@ app = typer.Typer(
 console = Console()
 
 _sklm: Optional[Sklm] = None
-_tracker_start: float = 0.0
-_tracker_command: str = ""
-_tracker: Optional["UmamiTracker"] = None  # type: ignore[name-defined]
-
-
-def get_tracker() -> Optional["UmamiTracker"]:
-    global _tracker
-    if _tracker is None:
-        from sklm.store import GlobalStore
-        from sklm.telemetry import UmamiTracker
-
-        store = GlobalStore()
-        cfg = store.get_telemetry_config()
-        _tracker = UmamiTracker(
-            umami_url=cfg.umami_url,
-            website_id=cfg.website_id,
-            enabled=cfg.enabled,
-        )
-    return _tracker
 
 
 def get_sklm() -> Sklm:
@@ -126,9 +104,7 @@ def main(
         False, "--version", "-V", help="Show version", callback=version_callback
     ),
 ):
-    global _tracker_start, _tracker_command
-    _tracker_start = time.monotonic()
-    _tracker_command = ctx.invoked_subcommand or ""
+    pass
 
 
 def _get_agent_selection_for_init(f: Sklm) -> list[str]:
@@ -832,86 +808,6 @@ def detect():
         console.print("[yellow]No supported agent detected.[/]")
 
 
-# ─── Telemetry ────────────────────────────────────────────────────────────────
-
-
-telemetry_app = typer.Typer(help="Manage telemetry settings")
-app.add_typer(telemetry_app, name="telemetry")
-
-
-@telemetry_app.command("on")
-def telemetry_on():
-    """Enable telemetry."""
-    from sklm.store import GlobalStore
-
-    store = GlobalStore()
-    cfg = store.get_telemetry_config()
-    cfg.enabled = True
-    store.set_telemetry_config(cfg)
-    console.print("[green]✓[/] Telemetry enabled")
-
-
-@telemetry_app.command("off")
-def telemetry_off():
-    """Disable telemetry."""
-    from sklm.store import GlobalStore
-
-    store = GlobalStore()
-    cfg = store.get_telemetry_config()
-    cfg.enabled = False
-    store.set_telemetry_config(cfg)
-    console.print("[yellow]⚠[/] Telemetry disabled")
-
-
-@telemetry_app.command("status")
-def telemetry_status():
-    """Show telemetry status."""
-    from sklm.store import GlobalStore
-
-    store = GlobalStore()
-    cfg = store.get_telemetry_config()
-    tracker = get_tracker()
-
-    if not tracker:
-        console.print("[yellow]⚠ Telemetry not initialized[/]")
-        raise typer.Exit(1)
-
-    if not cfg.umami_url or not cfg.website_id:
-        console.print("[yellow]⚠ Telemetry inactive[/]")
-        console.print("   Configure SKLM_UMAMI_URL and SKLM_WEBSITE_ID")
-        console.print("   or run: [bold]sklm telemetry on[/]")
-        raise typer.Exit(1)
-
-    if tracker.active:
-        console.print(f"[green]Active[/] → {cfg.umami_url}")
-    else:
-        console.print("[yellow]⚠ Telemetry disabled[/]")
-        console.print("   Run [bold]sklm telemetry on[/] to enable")
-
-
-@telemetry_app.command("ping")
-def telemetry_ping():
-    """Send a test event to verify telemetry connectivity."""
-    tracker = get_tracker()
-
-    if not tracker:
-        console.print("[red]✗ Telemetry not initialized[/]")
-        raise typer.Exit(1)
-
-    if not tracker.active:
-        console.print("[yellow]⚠ Telemetry disabled or not configured[/]")
-        console.print("   Run [bold]sklm telemetry on[/] to enable")
-        raise typer.Exit(1)
-
-    console.print("[dim]Sending test event...[/]")
-    ok, status, dur = tracker.ping()
-    if ok:
-        console.print(f"[green]✓ Ping succeeded[/] ({status}, {dur:.0f}ms)")
-    else:
-        console.print(f"[red]✗ Ping failed[/] ({status})")
-        raise typer.Exit(1)
-
-
 # ─── Update ─────────────────────────────────────────────────────────────────
 
 
@@ -991,8 +887,6 @@ def _show_update_notice() -> None:
 
 
 def run():
-    global _tracker_command
-
     # TTY detection: launch wizard when interactive with no arguments
     if len(sys.argv) <= 1:
         if sys.stdin.isatty():
@@ -1010,47 +904,6 @@ def run():
         error = e
     except BaseException as e:
         error = e
-
-    _track_success = True
-    _track_error = None
-    _track_error_message = None
-    _track_traceback = None
-
-    if isinstance(error, SystemExit):
-        cause = getattr(error, "__cause__", None)
-        if cause:
-            _track_success = False
-            _track_error = type(cause).__name__
-            _track_error_message = (str(cause).replace(str(Path.home()), "~")) or None
-            tb_frames = tb_mod.extract_tb(cause.__traceback__)
-            if tb_frames:
-                tail = tb_frames[-3:]
-                raw = "".join(tb_mod.format_list(tail))
-                # Sanitize: replace all absolute file paths with just the filename
-                sanitized = re.sub(r'File "([^"]+)", line (\d+)',
-                                   lambda m: f'File "{Path(m.group(1)).name}", line {m.group(2)}',
-                                   raw)
-                _track_traceback = sanitized.rstrip()
-        else:
-            _track_success = error.code in (None, 0)
-            _track_error = None if _track_success else "error"
-    elif error is not None:
-        _track_success = False
-        _track_error = type(error).__name__
-        _track_error_message = (str(error).replace(str(Path.home()), "~")) or None
-
-    if _tracker_start > 0:
-        duration = (time.monotonic() - _tracker_start) * 1000
-        tracker = get_tracker()
-        if tracker:
-            tracker.track_command(
-                _tracker_command,
-                _track_success,
-                duration,
-                _track_error,
-                _track_error_message,
-                _track_traceback,
-            )
 
     _show_update_notice()
 

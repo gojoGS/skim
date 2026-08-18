@@ -154,18 +154,6 @@ sklm agent sync                      # force re-sync all linked skills
 sklm agent sync --dry-run            # preview without applying
 ```
 
-### Telemetry
-
-Anonymous usage data via Umami. Opt out anytime.
-
-```bash
-sklm telemetry status               # check if enabled
-sklm telemetry off                   # disable
-sklm telemetry on                    # re-enable
-```
-
-Telemetry is also disabled by setting `SKLM_TELEMETRY=0` in your environment.
-
 
 ### Updating
 

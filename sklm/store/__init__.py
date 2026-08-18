@@ -12,7 +12,7 @@ from typing import Optional
 import yaml
 from rich.console import Console
 
-from sklm.models import GlobalConfig, Resource, ResourceKind, SourceMetadata, TelemetryConfig
+from sklm.models import GlobalConfig, Resource, ResourceKind, SourceMetadata
 
 
 console = Console()
@@ -240,29 +240,3 @@ class GlobalStore:
     def get_resource(self, kind: ResourceKind, name: str) -> Optional[Resource]:
         config = self._load_config()
         return config.resources.get(f"{kind.value}:{name}")
-
-    def get_telemetry_config(self) -> TelemetryConfig:
-        config = self._load_config()
-        cfg = config.telemetry
-
-        if "SKLM_TELEMETRY" in os.environ:
-            enabled = os.environ["SKLM_TELEMETRY"] not in (
-                "0",
-                "false",
-                "no",
-                "off",
-                "",
-            )
-        else:
-            enabled = cfg.enabled
-
-        return TelemetryConfig(
-            enabled=enabled,
-            umami_url=os.environ.get("SKLM_UMAMI_URL") or cfg.umami_url,
-            website_id=os.environ.get("SKLM_WEBSITE_ID") or cfg.website_id,
-        )
-
-    def set_telemetry_config(self, cfg: TelemetryConfig) -> None:
-        config = self._load_config()
-        config.telemetry = cfg
-        self._save_config(config)
