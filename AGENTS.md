@@ -3,11 +3,10 @@
 ## Setup & dev commands
 
 ```bash
-pip install skim                  # install from PyPI
-pip install -e .                  # editable install (development)
-pip install -r requirements.txt   # pytest + pytest-cov
-python3 -m pytest tests/          # run all tests (single file: tests/test_skim.py)
-python3 -m pytest tests/ -k <pattern>  # run a subset
+uv tool install skim              # install from PyPI
+uv sync                           # create venv + install project + dev deps
+uv run python -m pytest tests/    # run all tests (single file: tests/test_skim.py)
+uv run python -m pytest tests/ -k <pattern>  # run a subset
 ```
 
 No CI, no linting, no typechecking. Single test file, no `tests/__init__.py`.
@@ -70,7 +69,7 @@ Note: `.skim/` is in `.gitignore` — the per-project workspace is intentionally
 - Only `skill` resource kind exists — `ResourceKind` enum has a single value.
 - `link`/`unlink` are **internal API only** (no CLI commands). Use `add`/`rm`.
 - Agent sync **copies** (not symlinks) content with variant overlay from `variants/<agent-id>/`.
-- Editable install optional (`pip install -e .`) — the update mechanism runs `pip install -U skim`.
+- Editable install optional (`uv sync`) — the update mechanism runs `pip install -U skim`.
 
 ## Agent config (agents.yaml)
 
@@ -95,6 +94,6 @@ This repo uses `opencode.jsonc` with a build prompt that repeats these rules. Th
 1. Check `git status` before any edit — if uncommitted changes exist, ask the user first.
 2. Create a feature branch: `git checkout -b agent/<short-description>`.
 3. Never edit code on `main` or `master`.
-4. Run `python3 -m pytest tests/` before committing.
+4. Run `uv run python -m pytest tests/` before committing.
 5. Commit with a clear message prefix: `feat:`, `fix:`, `refactor:`.
 6. Push the branch when done.
