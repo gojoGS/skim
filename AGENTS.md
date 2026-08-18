@@ -25,7 +25,7 @@ Two-level store:
 ```
 ~/.sklm/                   # global store (~/.sklm/ or $SKLM_HOME)
   store/skills/            #   installed skill dirs (each has SKILL.md)
-  config.yaml              #   GlobalConfig — resource catalog + telemetry
+  config.yaml              #   GlobalConfig — resource catalog
   registries.yaml          #   RegistrySource entries
   cache/                   #   shallow-cloned git repos for install --from
 
@@ -58,7 +58,6 @@ Note: `.sklm/` is in `.gitignore` — the per-project workspace is intentionally
 | `sklm/agents/generic.py` | `GenericAdapter` — handles 28 auto-detect agents |
 | `sklm/agents/github_copilot.py` | `GitHubCopilotAdapter` — custom (detect: explicit) |
 | `sklm/agents/registry.py` | `AgentRegistry` — discovery + adapter lookup |
-| `sklm/telemetry.py` | `UmamiTracker` — daemon thread, 2s timeout |
 
 ## Conventions
 
@@ -87,10 +86,7 @@ Note: `.sklm/` is in `.gitignore` — the per-project workspace is intentionally
 
 ## Telemetry
 
-- Umami Analytics. Default endpoint: `https://analytics.victorbeysseriat.fr`.
-- Disable: `SKLM_TELEMETRY=0` env var (also `false`/`no`/`off`/`""`).
-- Override URL/ID: `SKLM_UMAMI_URL`, `SKLM_WEBSITE_ID` env vars.
-- Runs in a daemon thread with 2s join timeout — never raises, never blocks.
+Removed in this fork.
 
 ## Git workflow
 
