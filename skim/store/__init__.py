@@ -157,7 +157,7 @@ class GlobalStore:
                             candidate = Path(dirpath) / name
                             if (candidate / "SKILL.md").exists():
                                 src = candidate
-                                resolved_subdir = str(src.relative_to(cache_path))
+                                resolved_subdir = src.relative_to(cache_path).as_posix()
                                 break
 
         if not src.exists() or not src.is_dir():

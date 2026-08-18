@@ -13,6 +13,13 @@ from skim.core.registry import RegistryManager
 from skim.store import GlobalStore
 
 
+def _is_windows_path(name: str) -> bool:
+    """True if ``name`` looks like an absolute Windows path (e.g. ``C:\\...``)."""
+    if len(name) < 3:
+        return False
+    return name[0].isalpha() and name[1] == ":" and name[2] in ("\\", "/")
+
+
 console = Console()
 
 
@@ -75,7 +82,7 @@ def _resolve_resource(
     kind: ResourceKind,
     name: str,
 ) -> ResourceRef:
-    if ":" in name:
+    if ":" in name and not _is_windows_path(name):
         registry_name, resource_name = name.split(":", 1)
         results = registry_manager.search(resource_name, registry_filter=registry_name, type_filter=kind)
         if results:
